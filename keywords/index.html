@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Editor de Keywords</title>
+	<link rel="stylesheet" type="text/css" href="estilo/page_style.css" />	
+	<link rel="stylesheet" type="text/css" href="input_style.css" />	
+	<link rel="stylesheet" type="text/css" href="estilo/gh-fork-ribbon.css" />
+	<!--[if IE]>
+		<link rel="stylesheet" href="estilo/gh-fork-ribbon.ie.css" />
+	<![endif]-->
+
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" ></script>
+	<script type="text/javascript" src="tokenizer.js"></script>
+	<!--[if lt IE 9]><script src="http://css3-mediaqueries-js.googlecode.com/svn/trunk/css3-mediaqueries.js"></script><![endif]-->
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+</head>
+<body>
+	<section class="main">   
+		
+		<input id="targetInput" type="text">
+		
+	</section>
+
+	<script type="text/javascript">
+		window.tokenInput = $('#targetInput').tokenizer({
+			onclick: function (token) { window.open(token.data('uri')); }, 
+                        source:  function(word, suggest, request, callback) {
+                            $.ajax({
+                            url: "http://lookup.dbpedia.org/api/search/PrefixSearch",
+                            data: { MaxHits: 10, QueryString: word },
+                            dataType: "json",
+                            success: function (response) {
+                                var label_list = response.results.map(function (m) { return m.label; });
+                                var uri_list = response.results.map(function (m) { return m.uri; });
+                                suggest(label_list, uri_list);
+                              }
+                            });
+                       }
+		});
+	</script>
+
+</body>
+</html>
